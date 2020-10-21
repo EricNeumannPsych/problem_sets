@@ -64,7 +64,12 @@ d <- read_excel(data_path, sheet=3)
 ## Pre-processing
 
 ```{r}
-
+d_renamed <- rename(d, "agreement" = "Agreement (0=complete disagreement; 5=complete agreement)")
+d_renamed_order <- d_renamed %>%
+  group_by(group, subscale) %>%
+  summarise(mean(agreement))
+d_renamed_order <- rename(d_renamed_order, "agreement" = "mean(agreement)")
+d_renamed_order
 ```
 
 ## Descriptive statistics
@@ -72,7 +77,10 @@ d <- read_excel(data_path, sheet=3)
 Try to recreate Figure 2 (fig2.png, also included in the same folder as this Rmd file):
 
 ```{r}
-
+plot <- d_renamed_order %>%
+  ggplot() +
+  geom_bar(aes(group, agreement, fill=subscale), stat="identity", position="dodge") 
+plot           
 ```
 
 ## Inferential statistics
@@ -81,33 +89,38 @@ Try to recreate Figure 2 (fig2.png, also included in the same folder as this Rmd
 
 ```{r}
 # reproduce the above results here
-
+#d_anova <- aov(data=d_renamed, agreement ~ group + 1|subscale + 1|group:subscale)
+#summary(d_anova)
+#did not work and was running out of my 3 hours here
 ```
 
 > Moroccans showed greater agreement with past-focused statements than Spaniards did, t(78) = 4.04, p = .001, 
 
 ```{r}
 # reproduce the above results here
-
+d_renamed_past <- d_renamed[which(d_renamed$subscale=='PAST'), ]
+t.test(d_renamed_past$agreement ~ d_renamed_past$group)
+#found different results
 ```
 
 > and Spaniards showed greater agreement with future-focused statements than Moroccans did, t(78) = −3.32, p = .001.(de la Fuente et al., 2014, p. 1685)
 
 ```{r}
 # reproduce the above results here
-
+d_renamed_future <- d_renamed[which(d_renamed$subscale=='FUTURE'), ]
+t.test(d_renamed_future$agreement ~ d_renamed_future$group)
 ```
 
 # Step 5: Reflection
 
 Were you able to reproduce the results you attempted to reproduce? If not, what part(s) were you unable to reproduce?
 
-> ANSWER HERE
+> No, unable to figure out with anova command and received different results for t-tests (but have different ideas what might be wrong, but out of time)
 
 How difficult was it to reproduce your results? 
 
-> ANSWER HERE
+> more difficult than group A #1
 
 What aspects made it difficult? What aspects made it easy?
 
-> ANSWER HERE
+> more steps involved
